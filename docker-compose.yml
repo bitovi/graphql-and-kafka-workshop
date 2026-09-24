@@ -1,0 +1,5 @@
+services:
+  library:
+    build: ./services/library
+    ports:
+      - "4001:4001"

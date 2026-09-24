@@ -1,0 +1,65 @@
+"""
+A book in the library.
+"""
+type Book {
+  id: ID!
+  title: String!
+  year: Int
+  genre: Genre!
+  "Resolved from authorId -- a nested resolver"
+  author: Author!
+  readingDifficulty: ReadingDifficulty
+}
+
+enum ReadingDifficulty {
+  EASY
+  MEDIUM
+  HARD
+  ADVANCED
+}
+
+type Author {
+  id: ID!
+  name: String!
+  "Resolved by filtering books -- the other direction of the relationship"
+  books: [Book!]!
+}
+
+"""
+A comic in the library.
+"""
+type Comic {
+  id: ID!
+  title: String!
+  year: Int
+  genre: Genre!
+  inColor: Boolean!
+  "Other comics by the same author"
+  comics: [Comic!]!
+}
+
+enum Genre {
+  FANTASY
+  SCIENCE_FICTION
+  MYSTERY
+  NONFICTION
+}
+
+input AddBookInput {
+  title: String!
+  year: Int
+  genre: Genre!
+  authorId: ID!
+}
+
+type Query {
+  books(genre: Genre): [Book!]!
+  book(id: ID!): Book
+  authors: [Author!]!
+  author(id: ID!): Author
+  comic(id: ID!): Comic
+}
+
+type Mutation {
+  addBook(input: AddBookInput!): Book!
+}
