@@ -1,0 +1,21 @@
+{
+  // Placeholder for GraphQL 102. Docker is included for running federated
+  // subgraphs (and Kafka later); raise cpus once 102 has real workloads.
+  "name": "GraphQL 102",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/102",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "hostRequirements": {
+    "cpus": 2
+  },
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["README.md"]
+    },
+    "vscode": {
+      "extensions": ["GraphQL.vscode-graphql-syntax"]
+    }
+  }
+}
