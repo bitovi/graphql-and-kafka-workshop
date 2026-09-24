@@ -5,11 +5,11 @@
   "hostRequirements": {
     "cpus": 8
   },
-  "postCreateCommand": "cd services/library && npm ci",
+  "postCreateCommand": "cd services/policies && npm ci",
   "forwardPorts": [4001],
   "portsAttributes": {
     "4001": {
-      "label": "Library GraphQL API (Apollo Sandbox)",
+      "label": "Policies GraphQL API (Apollo Sandbox)",
       "onAutoForward": "openBrowser"
     }
   },

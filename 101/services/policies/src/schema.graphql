@@ -1,0 +1,49 @@
+"""
+An insurance policy issued to a policyholder.
+"""
+type Policy {
+  id: ID!
+  "Human-readable identifier, e.g. AUTO-100001"
+  policyNumber: String!
+  type: PolicyType!
+  "Monthly premium in US dollars"
+  monthlyPremium: Float!
+  "Date coverage starts (YYYY-MM-DD)"
+  effectiveDate: String!
+  riskTier: String
+  "Resolved from policyholderId -- a nested resolver"
+  policyholder: Policyholder!
+}
+
+type Policyholder {
+  id: ID!
+  name: String!
+  email: String!
+  "Resolved by filtering policies -- the other direction of the relationship"
+  policies: [Policy!]!
+}
+
+enum PolicyType {
+  AUTO
+  HOME
+  LIFE
+  RENTERS
+}
+
+input IssuePolicyInput {
+  type: PolicyType!
+  monthlyPremium: Float!
+  policyholderId: ID!
+  effectiveDate: String
+}
+
+type Query {
+  policies(type: PolicyType): [Policy!]!
+  policy(id: ID!): Policy
+  policyholders: [Policyholder!]!
+  policyholder(id: ID!): Policyholder
+}
+
+type Mutation {
+  issuePolicy(input: IssuePolicyInput!): Policy!
+}

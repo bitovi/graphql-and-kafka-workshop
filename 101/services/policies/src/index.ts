@@ -20,4 +20,4 @@ const { url } = await startStandaloneServer(server, {
   listen: { port, host: "0.0.0.0" },
 });
 
-console.log(`🚀 Library service ready at ${url}`);
+console.log(`🚀 Policies service ready at ${url}`);
