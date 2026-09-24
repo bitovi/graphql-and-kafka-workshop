@@ -3,7 +3,7 @@
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/101",
   "hostRequirements": {
-    "cpus": 2
+    "cpus": 8
   },
   "postCreateCommand": "cd services/library && npm ci",
   "forwardPorts": [4001],
