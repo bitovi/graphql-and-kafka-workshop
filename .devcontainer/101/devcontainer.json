@@ -1,0 +1,24 @@
+{
+  "name": "GraphQL 101",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/101",
+  "hostRequirements": {
+    "cpus": 2
+  },
+  "postCreateCommand": "cd services/library && npm ci",
+  "forwardPorts": [4001],
+  "portsAttributes": {
+    "4001": {
+      "label": "Library GraphQL API (Apollo Sandbox)",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["README.md"]
+    },
+    "vscode": {
+      "extensions": ["GraphQL.vscode-graphql-syntax"]
+    }
+  }
+}
