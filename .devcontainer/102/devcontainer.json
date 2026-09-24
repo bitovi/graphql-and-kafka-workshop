@@ -1,6 +1,7 @@
 {
   // Placeholder for GraphQL 102. Docker is included for running federated
-  // subgraphs (and Kafka later); raise cpus once 102 has real workloads.
+  // subgraphs (and Kafka later). hostRequirements makes Codespaces pick an
+  // 8-core machine by default, so participants don't have to choose one.
   "name": "GraphQL 102",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/102",
@@ -8,7 +9,7 @@
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "hostRequirements": {
-    "cpus": 2
+    "cpus": 8
   },
   "customizations": {
     "codespaces": {
