@@ -1,6 +1,6 @@
 // Data store for a fictional insurance company.
-// Policies are saved to data.json, so they survive server restarts.
-// Run `npm run reset-data` to go back to the starting policies below.
+// Policies are saved to data.json and claims to claims.json, so they survive server restarts.
+// Run `npm run reset-data` to go back to the starting data below.
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
@@ -21,6 +21,17 @@ export interface Policy {
   effectiveDate: string;
   riskTier?: RiskTier;
   policyholderId: string;
+}
+
+export type ClaimStatus = "OPEN" | "APPROVED" | "DENIED";
+
+export interface Claim {
+  id: string;
+  claimNumber: string;
+  amount: number;
+  status: ClaimStatus;
+  filedDate: string;
+  policyId: string;
 }
 
 export const policyholders: Policyholder[] = [
@@ -52,4 +63,30 @@ export const policies: Policy[] = loadPolicies();
 // Writes the current policies to data.json. Call this after changing a policy.
 export function savePolicies() {
   writeFileSync(dataFile, JSON.stringify(policies, null, 2) + "\n");
+}
+
+// The starting claims, used when claims.json doesn't exist yet.
+const seedClaims: Claim[] = [
+  { id: "c1", claimNumber: "CLM-5001", amount: 1250.0, status: "APPROVED", filedDate: "2025-04-02", policyId: "p1" },
+  { id: "c2", claimNumber: "CLM-5002", amount: 430.5, status: "DENIED", filedDate: "2025-06-18", policyId: "p1" },
+  { id: "c3", claimNumber: "CLM-5003", amount: 3800.0, status: "APPROVED", filedDate: "2024-11-05", policyId: "p2" },
+  { id: "c4", claimNumber: "CLM-5004", amount: 2200.0, status: "OPEN", filedDate: "2025-08-21", policyId: "p3" },
+  { id: "c5", claimNumber: "CLM-5005", amount: 975.25, status: "APPROVED", filedDate: "2025-05-09", policyId: "p3" },
+  { id: "c6", claimNumber: "CLM-5006", amount: 640.0, status: "OPEN", filedDate: "2025-09-12", policyId: "p5" },
+];
+
+const claimsFile = process.env.CLAIMS_FILE ?? new URL("../claims.json", import.meta.url);
+
+function loadClaims(): Claim[] {
+  if (existsSync(claimsFile)) {
+    return JSON.parse(readFileSync(claimsFile, "utf8"));
+  }
+  return seedClaims;
+}
+
+export const claims: Claim[] = loadClaims();
+
+// Writes the current claims to claims.json. Call this after changing a claim.
+export function saveClaims() {
+  writeFileSync(claimsFile, JSON.stringify(claims, null, 2) + "\n");
 }
