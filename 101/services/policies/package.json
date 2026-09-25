@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx watch --include \"src/**/*.graphql\" src/index.ts",
     "build": "tsc && cp src/schema.graphql dist/",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "reset-data": "rm -f data.json"
   },
   "dependencies": {
     "@apollo/server": "^5.5.1",

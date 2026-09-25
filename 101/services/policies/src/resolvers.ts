@@ -1,12 +1,15 @@
 import { GraphQLError } from "graphql";
-import { policies, policyholders, type Policy, type Policyholder, type PolicyType } from "./data.js";
+import { policies, policyholders, savePolicies, RiskTier, type Policy, type Policyholder, type PolicyType } from "./data.js";
 
 type IssuePolicyInput = Pick<Policy, "type" | "monthlyPremium" | "policyholderId"> & { effectiveDate?: string };
 
 export const resolvers = {
-  Query: {
-    policies: (_: unknown, args: { type?: PolicyType }) =>
-      args.type ? policies.filter((p) => p.type === args.type) : policies,
+  Query: {    
+    policies: (_: unknown, args: { type?: PolicyType}) =>
+      policies.filter((p) => {
+        if (args.type && p.type !== args.type) return false;
+        return true;
+    }),
     policy: (_: unknown, args: { id: string }) => policies.find((p) => p.id === args.id),
     policyholders: () => policyholders,
     policyholder: (_: unknown, args: { id: string }) => policyholders.find((ph) => ph.id === args.id),
@@ -32,8 +35,9 @@ export const resolvers = {
         effectiveDate: input.effectiveDate ?? new Date().toISOString().slice(0, 10),
       };
 
-      // 3. Save the policy by adding it to the in-memory list.
+      // 3. Save the policy: add it to the list, then write the list to data.json.
       policies.push(policy);
+      savePolicies();
 
       // 4. Return the new policy. GraphQL then resolves whatever fields
       //    the mutation selected (policyNumber, policyholder, ...).

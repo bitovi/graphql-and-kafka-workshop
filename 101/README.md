@@ -2,13 +2,13 @@
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/bitovi/graphql-and-kafka-workshop?devcontainer_path=.devcontainer/101/devcontainer.json)
 
-A single GraphQL service for a fictional insurance company: `services/policies` is an Apollo Server 5 (TypeScript) API with policies and policyholders held in memory.
+A single GraphQL service for a fictional insurance company: `services/policies` is an Apollo Server 5 (TypeScript) API with policies and policyholders. Policies you issue are saved to `services/policies/data.json`, so they survive restarts; `npm run reset-data` restores the starting data.
 
 | File | What it is |
 |---|---|
 | `services/policies/src/schema.graphql` | The schema: types, enum, input, Query, Mutation |
 | `services/policies/src/resolvers.ts` | Functions that produce each field's data |
-| `services/policies/src/data.ts` | In-memory data (resets on restart) |
+| `services/policies/src/data.ts` | Starting data, and saving policies to `data.json` |
 | `services/policies/src/index.ts` | Server bootstrap |
 
 ## Run it
