@@ -14,11 +14,16 @@ export const resolvers = {
 
   Mutation: {
     issuePolicy: (_: unknown, { input }: { input: IssuePolicyInput }) => {
+      // 1. Check the input. The schema confirms policyholderId is an ID,
+      //    but only the resolver can check that the policyholder exists.
       if (!policyholders.some((ph) => ph.id === input.policyholderId)) {
         throw new GraphQLError(`Policyholder ${input.policyholderId} not found`, {
           extensions: { code: "BAD_USER_INPUT" },
         });
       }
+
+      // 2. Fill in server-generated values. The client never chooses the
+      //    id or policyNumber, and effectiveDate defaults to today.
       const n = policies.length + 1;
       const policy: Policy = {
         ...input,
@@ -26,7 +31,12 @@ export const resolvers = {
         policyNumber: `${input.type}-${100000 + n}`,
         effectiveDate: input.effectiveDate ?? new Date().toISOString().slice(0, 10),
       };
+
+      // 3. Save the policy by adding it to the in-memory list.
       policies.push(policy);
+
+      // 4. Return the new policy. GraphQL then resolves whatever fields
+      //    the mutation selected (policyNumber, policyholder, ...).
       return policy;
     },
   },

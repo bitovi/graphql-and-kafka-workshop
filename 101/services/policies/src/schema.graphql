@@ -10,7 +10,7 @@ type Policy {
   monthlyPremium: Float!
   "Date coverage starts (YYYY-MM-DD)"
   effectiveDate: String!
-  riskTier: String
+  riskTier: RiskTier
   "Resolved from policyholderId -- a nested resolver"
   policyholder: Policyholder!
 }
@@ -28,6 +28,13 @@ enum PolicyType {
   HOME
   LIFE
   RENTERS
+}
+
+"How likely a policy is to lead to a claim, as rated by underwriting"
+enum RiskTier {
+  LOW
+  MEDIUM
+  HIGH
 }
 
 input IssuePolicyInput {

@@ -1,6 +1,7 @@
 // In-memory data store for a fictional insurance company. Resets every time the server restarts.
 
 export type PolicyType = "AUTO" | "HOME" | "LIFE" | "RENTERS";
+export type RiskTier = "LOW" | "MEDIUM" | "HIGH";
 
 export interface Policyholder {
   id: string;
@@ -14,7 +15,7 @@ export interface Policy {
   type: PolicyType;
   monthlyPremium: number;
   effectiveDate: string;
-  riskTier?: "LOW" | "MEDIUM" | "HIGH";
+  riskTier?: RiskTier;
   policyholderId: string;
 }
 
