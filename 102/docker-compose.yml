@@ -1,0 +1,5 @@
+services:
+  policies:
+    build: ./services/policies
+    ports:
+      - "4001:4001"

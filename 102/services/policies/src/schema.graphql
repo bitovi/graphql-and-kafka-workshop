@@ -1,0 +1,90 @@
+"""
+An insurance policy issued to a policyholder.
+"""
+type Policy {
+  id: ID!
+  "Human-readable identifier, e.g. AUTO-100001"
+  policyNumber: String!
+  type: PolicyType!
+  "Monthly premium in US dollars"
+  monthlyPremium: Float!
+  "Yearly premium in US dollars, calculated from monthlyPremium"
+  annualPremium: Float!
+  "Date coverage starts (YYYY-MM-DD)"
+  effectiveDate: String!
+  riskTier: RiskTier!
+  "Resolved from policyholderId -- a nested resolver"
+  policyholder: Policyholder!
+  claims: [Claim!]!
+  "Total amount of this policy's approved claims"
+  totalClaimed: Float!
+}
+
+type Policyholder {
+  id: ID!
+  name: String!
+  email: String!
+  "Resolved by filtering policies -- the other direction of the relationship"
+  policies: [Policy!]!
+}
+
+enum PolicyType {
+  AUTO
+  HOME
+  LIFE
+  RENTERS
+}
+
+"How likely a policy is to lead to a claim, as rated by underwriting"
+enum RiskTier {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+"""
+A request for payment against a policy.
+"""
+type Claim {
+  id: ID!
+  "Human-readable identifier, e.g. CLM-5001"
+  claimNumber: String!
+  "Amount claimed in US dollars"
+  amount: Float!
+  status: ClaimStatus!
+  "Date the claim was filed (YYYY-MM-DD)"
+  filedDate: String!
+  policy: Policy!
+}
+
+enum ClaimStatus {
+  OPEN
+  APPROVED
+  DENIED
+}
+
+input IssuePolicyInput {
+  type: PolicyType!
+  monthlyPremium: Float!
+  policyholderId: ID!
+  riskTier: RiskTier!
+  effectiveDate: String
+}
+
+input FileClaimInput {
+  policyId: ID!
+  amount: Float!
+}
+
+type Query {
+  policies(type: PolicyType, riskTier: RiskTier): [Policy!]!
+  policy(id: ID!): Policy
+  policyholders: [Policyholder!]!
+  policyholder(id: ID!): Policyholder
+  claims(status: ClaimStatus): [Claim!]!
+}
+
+type Mutation {
+  issuePolicy(input: IssuePolicyInput!): Policy!
+  fileClaim(input: FileClaimInput!): Claim!
+}
