@@ -12,7 +12,8 @@
   "dependencies": {
     "@apollo/server": "^5.5.1",
     "dataloader": "^2.2.3",
-    "graphql": "^16.14.2"
+    "graphql": "^16.14.2",
+    "graphql-scalars": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.20.4",
