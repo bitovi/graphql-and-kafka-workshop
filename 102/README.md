@@ -9,6 +9,7 @@ GraphQL 102 starts where 101 ends. `services/policies` is the 101 Apollo Server 
 | `services/policies/src/schema.graphql` | The schema: types, enums, inputs, Query, Mutation |
 | `services/policies/src/resolvers.ts` | Functions that produce each field's data |
 | `services/policies/src/loaders.ts` | DataLoaders that batch lookups for nested fields |
+| `services/policies/src/auth.ts` | Fake tokens and users for the Authorization lesson |
 | `services/policies/src/data.ts` | Starting data, and saving policies and claims |
 | `services/policies/src/index.ts` | Server bootstrap |
 
