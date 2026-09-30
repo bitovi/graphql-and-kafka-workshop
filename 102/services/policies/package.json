@@ -13,9 +13,11 @@
     "@apollo/server": "^5.5.1",
     "dataloader": "^2.2.3",
     "graphql": "^16.14.2",
+    "graphql-depth-limit": "^1.1.0",
     "graphql-scalars": "^2.0.0"
   },
   "devDependencies": {
+    "@types/graphql-depth-limit": "^1.1.6",
     "@types/node": "^22.20.4",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
