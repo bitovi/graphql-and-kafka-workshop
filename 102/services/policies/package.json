@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@apollo/server": "^5.5.1",
+    "@apollo/server-plugin-response-cache": "^5.0.0",
     "dataloader": "^2.2.3",
     "graphql": "^16.14.2",
     "graphql-depth-limit": "^1.1.0",
