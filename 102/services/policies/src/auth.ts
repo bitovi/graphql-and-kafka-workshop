@@ -1,4 +1,4 @@
-// Stand-in for real authentication, used in the Authorization lesson.
+// Stand-in for real authentication, used in the Authorization section.
 // A real API would check a signed token (for example, a JWT from an identity
 // provider). Here, each fake token maps straight to a user.
 

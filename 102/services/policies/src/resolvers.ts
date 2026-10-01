@@ -27,6 +27,8 @@ export const resolvers = {
         return true;
       }),
     policy: (_: unknown, args: { id: string }) => policies.find((p) => p.id === args.id),
+    findPolicy: (_: unknown, { by }: { by: { id?: string; policyNumber?: string } }) =>
+      policies.find((p) => p.id === by.id || p.policyNumber === by.policyNumber),
     policyholders: () => policyholders,
     policyholder: (_: unknown, args: { id: string }) => policyholders.find((ph) => ph.id === args.id),
     claims: (_: unknown, args: { status?: ClaimStatus }) =>

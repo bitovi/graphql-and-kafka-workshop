@@ -71,6 +71,12 @@ input IssuePolicyInput {
   effectiveDate: String
 }
 
+"Look up a policy by exactly one of these fields"
+input PolicyLookupInput @oneOf {
+  id: ID
+  policyNumber: String
+}
+
 input FileClaimInput {
   policyId: ID!
   amount: Float!
@@ -78,7 +84,8 @@ input FileClaimInput {
 
 type Query {
   policies(type: PolicyType, riskTier: RiskTier): [Policy!]!
-  policy(id: ID!): Policy
+  policy(id: ID!): Policy @deprecated(reason: "Use findPolicy, which can look a policy up by id or policy number.")
+  findPolicy(by: PolicyLookupInput!): Policy
   policyholders: [Policyholder!]!
   policyholder(id: ID!): Policyholder
   claims(status: ClaimStatus): [Claim!]!
