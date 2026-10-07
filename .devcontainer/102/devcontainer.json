@@ -1,16 +1,7 @@
 {
-  // Docker is included for running federated subgraphs (and Kafka later).
-  // hostRequirements makes Codespaces pick an 8-core machine by default, so
-  // participants don't have to choose one.
   "name": "GraphQL 102",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/102",
-  "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
-  },
-  "hostRequirements": {
-    "cpus": 8
-  },
   "postCreateCommand": "cd services/policies && npm ci",
   "forwardPorts": [4001],
   "portsAttributes": {
