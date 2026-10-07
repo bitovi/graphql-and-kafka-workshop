@@ -16,8 +16,10 @@ const usersByToken: Record<string, User> = {
 };
 
 // Turns an Authorization header, like "Bearer agent-token", into a user.
-// Returns null when there's no header, or the token isn't one of the above.
+// Returns null when there's no header, the header doesn't start with "Bearer ",
+// or the token isn't one of the above.
 export function getUser(authorization: string | undefined): User | null {
-  const token = authorization?.replace("Bearer ", "") ?? "";
+  if (!authorization?.startsWith("Bearer ")) return null;
+  const token = authorization.slice("Bearer ".length);
   return usersByToken[token] ?? null;
 }
