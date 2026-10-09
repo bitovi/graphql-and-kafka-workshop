@@ -3,7 +3,7 @@
   "private": true,
   "description": "Starts Kafka, the other teams' APIs, the Claims Desk, and the gateway.",
   "scripts": {
-    "start": "docker compose up -d --wait && npm --prefix gateway start",
+    "start": "docker compose up -d --build --wait && npm --prefix gateway start",
     "stop": "docker compose down",
     "topics": "docker compose exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list --exclude-internal",
     "consumer-groups": "docker compose exec kafka /opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server kafka:9092 --describe --all-groups",
