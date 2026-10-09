@@ -3,6 +3,11 @@
 
 const REFRESH_MS = 5000;
 
+// Claims are shown a page at a time. "Show more claims" asks the gateway for the next page,
+// passing the last page's endCursor as `after`.
+const PAGE_SIZE = 2;
+const extraPages = new Map(); // policy id -> how many more pages to show
+
 async function graphql(query, variables) {
   const response = await fetch("/graphql", {
     method: "POST",
@@ -31,13 +36,22 @@ async function inspectGraph() {
     claims: Boolean(claimsField),
     claimsIsConnection: claimsField ? namedType(claimsField.type).endsWith("Connection") : false,
     claimsTakesFirst: claimsField ? claimsField.args.some((a) => a.name === "first") : false,
+    claimsPaged:
+      Boolean(claimsField) &&
+      namedType(claimsField.type).endsWith("Connection") &&
+      claimsField.args.some((a) => a.name === "after") &&
+      queryFields.has("findPolicy"),
   };
 }
 
+const claimFields = "id claimNumber amount status";
+const claimPage = `edges { node { ${claimFields} } } pageInfo { hasNextPage endCursor }`;
+
 function buildQuery(graph) {
-  const claimFields = "id claimNumber amount status";
   let claims = "";
-  if (graph.claims) {
+  if (graph.claimsPaged) {
+    claims = `claims(first: ${PAGE_SIZE}) { ${claimPage} }`;
+  } else if (graph.claims) {
     const args = graph.claimsTakesFirst ? "(first: 20)" : "";
     claims = graph.claimsIsConnection ? `claims${args} { edges { node { ${claimFields} } } }` : `claims${args} { ${claimFields} }`;
   }
@@ -70,6 +84,26 @@ function renderSources(graph) {
 
 const lastStatus = new Map();
 
+// Follows each expanded policy's cursors to load the extra pages it shows.
+async function loadExtraPages(policies) {
+  for (const policy of policies) {
+    let pages = extraPages.get(policy.id) ?? 0;
+    while (pages > 0 && policy.claims.pageInfo.hasNextPage) {
+      const result = await graphql(
+        `query MoreClaims($id: ID!, $after: String) {
+          findPolicy(by: { id: $id }) { claims(first: ${PAGE_SIZE}, after: $after) { ${claimPage} } }
+        }`,
+        { id: policy.id, after: policy.claims.pageInfo.endCursor },
+      );
+      const page = result.data?.findPolicy?.claims;
+      if (!page) break;
+      policy.claims.edges.push(...page.edges);
+      policy.claims.pageInfo = page.pageInfo;
+      pages--;
+    }
+  }
+}
+
 function renderPolicies(graph, policies) {
   const rows = policies.map((p) => {
     let claimsCell = graph.claimsInGraph
@@ -90,6 +124,9 @@ function renderPolicies(graph, policies) {
             })
             .join("")
         : '<span class="sub">No claims</span>';
+      if (graph.claimsPaged && p.claims.pageInfo.hasNextPage) {
+        claimsCell += `<button class="more" data-policy="${escapeHtml(p.id)}">Show more claims</button>`;
+      }
     }
     const paidOut = graph.payouts ? money(p.totalPaidOut) : "";
     return `<tr>
@@ -110,7 +147,11 @@ function showError(message) {
   el.hidden = !message;
 }
 
+let refreshing = false;
+
 async function refresh() {
+  if (refreshing) return;
+  refreshing = true;
   try {
     const graph = await inspectGraph();
     renderSources(graph);
@@ -120,13 +161,26 @@ async function refresh() {
       document.getElementById("policies").hidden = true;
       return;
     }
+    if (graph.claimsPaged) await loadExtraPages(result.data.policies);
     renderPolicies(graph, result.data.policies);
     showError(result.errors ? `Some data is missing: ${result.errors[0].message}` : "");
     document.getElementById("updated").textContent = `Updated ${new Date().toLocaleTimeString()}`;
   } catch (error) {
     showError(`Can't load data from the gateway: ${error.message}. Is the gateway running on port 4000?`);
+  } finally {
+    refreshing = false;
   }
 }
+
+document.querySelector("#policies tbody").addEventListener("click", (event) => {
+  const button = event.target.closest("button.more");
+  if (!button) return;
+  const id = button.dataset.policy;
+  extraPages.set(id, (extraPages.get(id) ?? 0) + 1);
+  button.disabled = true;
+  button.textContent = "Loading...";
+  refresh();
+});
 
 refresh();
 setInterval(refresh, REFRESH_MS);

@@ -201,3 +201,20 @@ td {
   color: var(--muted);
   font-style: italic;
 }
+
+.more {
+  margin-top: 2px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.more:disabled {
+  color: var(--muted);
+  cursor: default;
+}
