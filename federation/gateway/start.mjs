@@ -18,7 +18,6 @@ const subgraphsFile = `${here}subgraphs.json`;
 
 let composer;
 let gateway;
-let stopping = false;
 
 // Retry chatter from the Hive CLI that repeats every second while a subgraph is unreachable.
 const noise = /Abort retry|retry limit exceeded|failed with status \d+ \(\d+ms\)|failed \(\d+ms\)/;
@@ -84,13 +83,20 @@ function publish() {
   }
 }
 
-function startComposer() {
-  composer = spawn(bin("hive"), [...composeArgs(), "--watch"], { cwd: here, env: { ...process.env, HIVE_NO_ERROR_TIP: "1" } });
-  pipe("compose", composer);
-  composer.on("exit", () => {
-    if (!stopping) setTimeout(async () => {
-      await waitForSubgraphs();
-      if (!stopping) startComposer();
+// Each (re)start gets a new generation number. Processes from an older generation never
+// restart themselves, so a restart can't leave two gateways fighting over port 4000.
+let generation = 0;
+
+function startComposer(gen) {
+  if (gen !== generation) return;
+  const child = spawn(bin("hive"), [...composeArgs(), "--watch"], { cwd: here, env: { ...process.env, HIVE_NO_ERROR_TIP: "1" } });
+  composer = child;
+  pipe("compose", child);
+  child.on("exit", () => {
+    if (gen !== generation) return;
+    setTimeout(async () => {
+      await waitForSubgraphs(gen);
+      startComposer(gen);
     }, 3000);
   });
 }
@@ -99,9 +105,9 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Waits until every subgraph in subgraphs.json answers, so composing doesn't fail
 // just because a server is still starting.
-async function waitForSubgraphs() {
+async function waitForSubgraphs(gen) {
   let lastMessage = "";
-  while (!stopping) {
+  while (gen === generation) {
     const subgraphs = JSON.parse(readFileSync(subgraphsFile, "utf8"));
     const waiting = [];
     for (const [name, url] of Object.entries(subgraphs)) {
@@ -125,11 +131,13 @@ async function waitForSubgraphs() {
   }
 }
 
-function startGateway() {
-  gateway = spawn(bin("hive-gateway"), ["supergraph", "-c", "gateway.config.ts"], { cwd: here });
-  pipe("gateway", gateway);
-  gateway.on("exit", () => {
-    if (!stopping) setTimeout(startGateway, 2000);
+function startGateway(gen) {
+  if (gen !== generation) return;
+  const child = spawn(bin("hive-gateway"), ["supergraph", "-c", "gateway.config.ts"], { cwd: here });
+  gateway = child;
+  pipe("gateway", child);
+  child.on("exit", () => {
+    if (gen === generation) setTimeout(() => startGateway(gen), 2000);
   });
 }
 
@@ -144,41 +152,68 @@ async function composeOnce() {
 }
 
 async function start() {
+  const gen = generation;
   // Serve the last supergraph right away, if there is one.
-  if (existsSync(supergraphFile)) startGateway();
-  await waitForSubgraphs();
-  if (stopping) return;
+  if (existsSync(supergraphFile)) startGateway(gen);
+  await waitForSubgraphs(gen);
+  if (gen !== generation) return;
   await composeOnce();
-  startComposer();
-  if (!gateway || gateway.exitCode !== null) startGateway();
+  if (gen !== generation) return;
+  startComposer(gen);
+  if (!gateway) startGateway(gen);
 }
 
-function stopAll() {
-  stopping = true;
-  composer?.kill();
-  gateway?.kill();
+// Stops this generation's processes, and waits until they've exited.
+async function stopAll() {
+  generation++;
+  const children = [composer, gateway].filter(Boolean);
   composer = undefined;
   gateway = undefined;
+  await Promise.all(
+    children.map((child) =>
+      child.exitCode !== null || child.signalCode !== null
+        ? undefined
+        : new Promise((resolve) => {
+            child.once("exit", resolve);
+            child.kill();
+          }),
+    ),
+  );
 }
 
 let debounce;
+let restartTimer;
+let subgraphsText = readFileSync(subgraphsFile, "utf8");
+
 watch(here, (_event, file) => {
   if (file === ".composed.graphql") {
     clearTimeout(debounce);
     debounce = setTimeout(publish, 300);
   }
   if (file === "subgraphs.json") {
-    log("compose", "subgraphs.json changed. Restarting.");
-    stopAll();
-    setTimeout(() => {
-      stopping = false;
+    // One save can fire several events. Wait for them to settle, then restart once,
+    // and only if the list really changed.
+    clearTimeout(restartTimer);
+    restartTimer = setTimeout(async () => {
+      let text;
+      try {
+        text = readFileSync(subgraphsFile, "utf8");
+        JSON.parse(text);
+      } catch {
+        log("compose", "subgraphs.json isn't valid JSON yet. Fix it and save again.");
+        return;
+      }
+      if (text === subgraphsText) return;
+      subgraphsText = text;
+      log("compose", "subgraphs.json changed. Restarting.");
+      await stopAll();
       start();
-    }, 1000);
+    }, 500);
   }
 });
 
-process.on("SIGINT", () => {
-  stopAll();
+process.on("SIGINT", async () => {
+  await stopAll();
   process.exit(0);
 });
 
