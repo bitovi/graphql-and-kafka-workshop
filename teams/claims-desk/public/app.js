@@ -24,13 +24,20 @@ async function inspectGraph() {
       fields { name args { name } type { kind name ofType { kind name ofType { kind name } } } }
     }
     __schema { queryType { fields { name } } }
+    claimType: __type(name: "Claim") { fields(includeDeprecated: true) { name isDeprecated deprecationReason } }
   }`);
   if (result.errors) throw new Error(result.errors[0].message);
   const fields = new Map((result.data.__type?.fields ?? []).map((f) => [f.name, f]));
   const claimsField = fields.get("claims");
   const namedType = (t) => (t.name ? t.name : namedType(t.ofType));
   const queryFields = new Set(result.data.__schema.queryType.fields.map((f) => f.name));
+  // GraphQL doesn't warn about deprecated fields in a response. Apps find out from the schema.
+  const usedClaimFields = claimFields.split(" ");
+  const deprecated = (result.data.claimType?.fields ?? [])
+    .filter((f) => f.isDeprecated && usedClaimFields.includes(f.name))
+    .map((f) => ({ field: `Claim.${f.name}`, reason: f.deprecationReason }));
   return {
+    deprecated,
     claimsInGraph: queryFields.has("claims"),
     payouts: fields.has("payouts"),
     claims: Boolean(claimsField),
@@ -141,6 +148,14 @@ function renderPolicies(graph, policies) {
   document.getElementById("policies").hidden = false;
 }
 
+function renderDeprecations(graph) {
+  const el = document.getElementById("deprecations");
+  el.hidden = graph.deprecated.length === 0;
+  el.innerHTML = graph.deprecated
+    .map((d) => `<p><strong>This app uses <code>${escapeHtml(d.field)}</code>, which the schema marks as deprecated.</strong> ${escapeHtml(d.reason ?? "")}</p>`)
+    .join("");
+}
+
 function showError(message) {
   const el = document.getElementById("error");
   el.textContent = message;
@@ -155,6 +170,7 @@ async function refresh() {
   try {
     const graph = await inspectGraph();
     renderSources(graph);
+    renderDeprecations(graph);
     const result = await graphql(buildQuery(graph));
     if (result.errors && !result.data) {
       showError(`The gateway rejected the Claims Desk's query: ${result.errors[0].message}`);

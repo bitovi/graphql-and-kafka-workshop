@@ -218,3 +218,17 @@ td {
   color: var(--muted);
   cursor: default;
 }
+
+.deprecations {
+  margin-top: 24px;
+  border: 1px solid var(--warn);
+  background: var(--warn-fill);
+  color: var(--warn);
+  border-radius: 6px;
+  padding: 4px 16px;
+  font-size: 14px;
+}
+
+.deprecations code {
+  font-family: Menlo, Consolas, monospace;
+}
