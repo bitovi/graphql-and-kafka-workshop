@@ -6,3 +6,4 @@ payouts.json
 .composed.graphql
 supergraph.graphql
 .env
+scripts/.adjusting-sent.json

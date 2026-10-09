@@ -25,6 +25,7 @@ async function inspectGraph() {
     }
     __schema { queryType { fields { name } } }
     claimType: __type(name: "Claim") { fields(includeDeprecated: true) { name isDeprecated deprecationReason } }
+    subscriptionType: __type(name: "Subscription") { fields { name } }
   }`);
   if (result.errors) throw new Error(result.errors[0].message);
   const fields = new Map((result.data.__type?.fields ?? []).map((f) => [f.name, f]));
@@ -36,8 +37,10 @@ async function inspectGraph() {
   const deprecated = (result.data.claimType?.fields ?? [])
     .filter((f) => f.isDeprecated && usedClaimFields.includes(f.name))
     .map((f) => ({ field: `Claim.${f.name}`, reason: f.deprecationReason }));
+  const subscriptionFields = new Set((result.data.subscriptionType?.fields ?? []).map((f) => f.name));
   return {
     deprecated,
+    liveUpdates: subscriptionFields.has("claimStatusChanged"),
     claimsInGraph: queryFields.has("claims"),
     payouts: fields.has("payouts"),
     claims: Boolean(claimsField),
@@ -75,6 +78,7 @@ function renderSources(graph) {
   const chips = [
     { label: "Policies team: policies", on: true },
     { label: "Billing team: payouts", on: graph.payouts },
+    ...(graph.liveUpdates ? [{ label: liveConnected ? "Live updates: on" : "Live updates: connecting", on: liveConnected }] : []),
     {
       label: graph.claims
         ? "Your Claims API: claims on every policy"
@@ -90,6 +94,44 @@ function renderSources(graph) {
 }
 
 const lastStatus = new Map();
+
+// Live updates: subscribes to claimStatusChanged through the gateway, over a WebSocket,
+// using the graphql-transport-ws protocol (https://github.com/enisdenjo/graphql-ws).
+// Each change refreshes the page, so the new status flashes.
+let liveSocket = null;
+let liveConnected = false;
+
+function startLiveUpdates() {
+  if (liveSocket) return;
+  const url = `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/graphql`;
+  const socket = new WebSocket(url, "graphql-transport-ws");
+  liveSocket = socket;
+  socket.onopen = () => socket.send(JSON.stringify({ type: "connection_init" }));
+  socket.onmessage = (message) => {
+    const data = JSON.parse(message.data);
+    if (data.type === "connection_ack") {
+      socket.send(
+        JSON.stringify({
+          id: "claim-status",
+          type: "subscribe",
+          payload: { query: "subscription ClaimsDesk { claimStatusChanged { id status } }" },
+        }),
+      );
+      liveConnected = true;
+      refresh();
+    } else if (data.type === "next") {
+      refresh();
+    } else if (data.type === "ping") {
+      socket.send(JSON.stringify({ type: "pong" }));
+    } else if (data.type === "error" || data.type === "complete") {
+      socket.close();
+    }
+  };
+  socket.onclose = () => {
+    liveSocket = null;
+    liveConnected = false;
+  };
+}
 
 // Follows each expanded policy's cursors to load the extra pages it shows.
 async function loadExtraPages(policies) {
@@ -169,6 +211,7 @@ async function refresh() {
   refreshing = true;
   try {
     const graph = await inspectGraph();
+    if (graph.liveUpdates) startLiveUpdates();
     renderSources(graph);
     renderDeprecations(graph);
     const result = await graphql(buildQuery(graph));

@@ -26,6 +26,21 @@ cd claims && npm run dev      # your Claims API
 
 Then open the **Ports** tab: **Gateway** (4000) for queries, **Claims Desk** (3000) for the app.
 
+## Other commands
+
+Run these in the third terminal:
+
+| Command | What it does |
+|---|---|
+| `npm run topics` | Lists the Kafka topics |
+| `npm run consumer-groups` | Shows each consumer group's place in each partition |
+| `npm run claim-events` | Prints the events in `claim-events`, one partition at a time |
+| `npm run billing:ship-v2` | Ships version 2 of the Billing subgraph |
+| `npm run adjuster:assign -- c6` | The Adjusting team assigns an adjuster to claim `c6` |
+| `npm run adjuster:replay -- c6` | Sends claim `c6`'s adjuster events again, with the same ids |
+| `npm run watch-claims` | Prints claim status changes as they happen, through the gateway |
+| `npm run traffic` | Files, assigns, and approves claims every few seconds, until Ctrl+C |
+
 ## Stop or start over
 
 ```sh

@@ -4,7 +4,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import type { ClaimEvent } from "./events.js";
 
-export type ClaimStatus = "OPEN" | "APPROVED" | "DENIED";
+export type ClaimStatus = "OPEN" | "IN_REVIEW" | "APPROVED" | "DENIED";
 
 export interface Claim {
   id: string;
@@ -13,6 +13,8 @@ export interface Claim {
   status: ClaimStatus;
   filedDate: string;
   policyId: string;
+  // Adjusters assigned to this claim, oldest first. You add these in Consuming Events.
+  assignments?: { adjuster: string; assignedAt: string }[];
 }
 
 const seedClaims: Claim[] = [
@@ -26,11 +28,18 @@ const seedClaims: Claim[] = [
 
 const claimsFile = process.env.CLAIMS_FILE ?? new URL("../claims.json", import.meta.url);
 
-function load(): { claims: Claim[]; outbox: ClaimEvent[] } {
-  if (!existsSync(claimsFile)) return { claims: seedClaims, outbox: [] };
+interface SavedData {
+  claims: Claim[];
+  outbox: ClaimEvent[];
+  processedEventIds: string[];
+}
+
+function load(): SavedData {
+  if (!existsSync(claimsFile)) return { claims: seedClaims, outbox: [], processedEventIds: [] };
   const saved = JSON.parse(readFileSync(claimsFile, "utf8"));
-  // Files saved before the outbox existed hold just the list of claims.
-  return Array.isArray(saved) ? { claims: saved, outbox: [] } : saved;
+  // Files saved by earlier versions hold just the list of claims, or have no processedEventIds.
+  if (Array.isArray(saved)) return { claims: saved, outbox: [], processedEventIds: [] };
+  return { processedEventIds: [], ...saved };
 }
 
 const saved = load();
@@ -40,8 +49,11 @@ export const claims: Claim[] = saved.claims;
 // Events waiting to be published to Kafka. The outbox relay (outbox-relay.ts) publishes them.
 export const outbox: ClaimEvent[] = saved.outbox;
 
-// Writes the claims and the outbox to claims.json, in one write. Call this after changing
-// a claim, or adding an event to the outbox.
+// The ids of events from other teams that this API has already handled.
+export const processedEventIds: string[] = saved.processedEventIds;
+
+// Writes the claims, the outbox, and the processed event ids to claims.json, in one write.
+// Call this after changing any of them.
 export function saveClaims() {
-  writeFileSync(claimsFile, JSON.stringify({ claims, outbox }, null, 2) + "\n");
+  writeFileSync(claimsFile, JSON.stringify({ claims, outbox, processedEventIds }, null, 2) + "\n");
 }

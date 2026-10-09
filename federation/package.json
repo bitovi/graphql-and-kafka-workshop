@@ -8,6 +8,10 @@
     "topics": "docker compose exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --list --exclude-internal",
     "consumer-groups": "docker compose exec kafka /opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server kafka:9092 --describe --all-groups",
     "billing:ship-v2": "echo BILLING_VERSION=2 > .env && docker compose up -d --wait billing",
-    "claim-events": "docker compose exec kafka sh -c 'for p in 0 1 2; do echo \"partition $p:\"; /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic claim-events --partition $p --offset earliest --timeout-ms 2000 --formatter-property print.key=true --formatter-property key.separator=\" \" 2>/dev/null; done'"
+    "claim-events": "docker compose exec kafka sh -c 'for p in 0 1 2; do echo \"partition $p:\"; /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic claim-events --partition $p --offset earliest --timeout-ms 2000 --formatter-property print.key=true --formatter-property key.separator=\" \" 2>/dev/null; done'",
+    "adjuster:assign": "node scripts/adjusting.mjs assign",
+    "adjuster:replay": "node scripts/adjusting.mjs replay",
+    "traffic": "node scripts/traffic.mjs",
+    "watch-claims": "node scripts/watch-claims.mjs"
   }
 }

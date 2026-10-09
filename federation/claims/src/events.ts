@@ -3,7 +3,8 @@
 import { randomUUID } from "node:crypto";
 import type { Claim } from "./data.js";
 
-export type ClaimEventType = "ClaimFiled" | "ClaimApproved";
+// ClaimStatusChanged is published whenever a claim's status changes. You add it in Live Updates.
+export type ClaimEventType = "ClaimFiled" | "ClaimApproved" | "ClaimStatusChanged";
 
 export interface ClaimEvent {
   specversion: "1.0";
