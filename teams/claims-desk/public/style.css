@@ -1,3 +1,11 @@
+/* Poppins, the font bitovi.com uses for display text. SIL Open Font License: fonts/OFL.txt */
+@font-face {
+  font-family: "Poppins";
+  src: url("fonts/Poppins-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   --ink: #1f2937;
   --muted: #6b7280;
@@ -32,6 +40,36 @@ header {
 h1 {
   margin: 0;
   font-size: 26px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  padding-right: 20px;
+  border-right: 1px solid var(--line);
+}
+
+.logo img {
+  display: block;
+  height: 34px;
+  width: auto;
+}
+
+.logo-word {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: #cb3036;
+  line-height: 1.4;
 }
 
 .tagline,
