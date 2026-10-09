@@ -1,0 +1,165 @@
+:root {
+  --ink: #1f2937;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --panel: #f9fafb;
+  --accent: #0f766e;
+  --accent-fill: #e6f4f1;
+  --warn: #b45309;
+  --warn-fill: #fef3e2;
+  --bad: #b91c1c;
+  --bad-fill: #fdecec;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  color: var(--ink);
+}
+
+body {
+  margin: 0 auto;
+  max-width: 1100px;
+  padding: 24px 16px 48px;
+  background: #ffffff;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 16px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.tagline,
+.updated {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.source {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 13px;
+  background: var(--panel);
+  color: var(--muted);
+}
+
+.source.on {
+  border-color: var(--accent);
+  background: var(--accent-fill);
+  color: var(--accent);
+}
+
+.error {
+  border: 1px solid var(--bad);
+  background: var(--bad-fill);
+  color: var(--bad);
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th {
+  text-align: left;
+  color: var(--muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--line);
+  padding: 8px;
+}
+
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 8px;
+  vertical-align: top;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.policy-number {
+  font-family: Menlo, Consolas, monospace;
+  font-weight: 600;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.claim {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.claim-number {
+  font-family: Menlo, Consolas, monospace;
+}
+
+.status {
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.status.APPROVED {
+  color: var(--accent);
+  background: var(--accent-fill);
+  border-color: var(--accent);
+}
+
+.status.OPEN,
+.status.IN_REVIEW {
+  color: var(--warn);
+  background: var(--warn-fill);
+  border-color: var(--warn);
+}
+
+.status.DENIED {
+  color: var(--bad);
+  background: var(--bad-fill);
+  border-color: var(--bad);
+}
+
+.flash {
+  animation: flash 2s ease-out;
+}
+
+@keyframes flash {
+  from {
+    background: var(--accent-fill);
+  }
+  to {
+    background: transparent;
+  }
+}
+
+.waiting {
+  color: var(--muted);
+  font-style: italic;
+}

@@ -1,0 +1,65 @@
+"A date without a time, like 2026-10-01"
+scalar LocalDate @specifiedBy(url: "https://www.rfc-editor.org/rfc/rfc3339#section-5.6")
+
+"""
+A request for payment against a policy.
+"""
+type Claim {
+  id: ID!
+  "Human-readable identifier, e.g. CLM-5001"
+  claimNumber: String!
+  "Amount claimed in US dollars"
+  amount: Float!
+  status: ClaimStatus!
+  filedDate: LocalDate!
+  "The id of the policy this claim is against. The Policies team owns policies."
+  policyId: ID!
+}
+
+enum ClaimStatus {
+  OPEN
+  APPROVED
+  DENIED
+}
+
+"One page of claims"
+type ClaimConnection {
+  edges: [ClaimEdge!]!
+  pageInfo: PageInfo!
+}
+
+type ClaimEdge {
+  cursor: String!
+  node: Claim!
+}
+
+type PageInfo {
+  startCursor: String
+  endCursor: String
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+}
+
+"Returned instead of a claim when the claim can't be approved because it isn't open"
+type ClaimNotOpen {
+  message: String!
+  status: ClaimStatus!
+}
+
+union ApproveClaimResult = Claim | ClaimNotOpen
+
+input FileClaimInput {
+  policyId: ID!
+  amount: Float!
+}
+
+type Query {
+  claims(status: ClaimStatus): [Claim!]!
+  claim(id: ID!): Claim
+  claimsConnection(first: Int!, after: String): ClaimConnection!
+}
+
+type Mutation {
+  fileClaim(input: FileClaimInput!): Claim!
+  approveClaim(id: ID!): ApproveClaimResult!
+}

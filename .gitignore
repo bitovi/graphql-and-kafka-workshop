@@ -2,3 +2,7 @@ node_modules
 dist
 data.json
 claims.json
+payouts.json
+.composed.graphql
+supergraph.graphql
+.env

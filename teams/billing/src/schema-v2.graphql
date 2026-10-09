@@ -1,0 +1,33 @@
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.9", import: ["@key"])
+
+"A date without a time, like 2026-10-01 (RFC 3339 full-date)"
+scalar LocalDate
+
+"Money paid to a policyholder for an approved claim. Owned by the Billing team."
+type Payout @key(fields: "id") {
+  id: ID!
+  "The approved claim this payout is for"
+  claimId: ID!
+  "Amount paid in US dollars"
+  amount: Float!
+  paidOn: LocalDate!
+}
+
+"Billing adds payout fields to the Policies team's Policy type."
+type Policy @key(fields: "id") {
+  id: ID!
+  payouts: [Payout!]!
+  "Total paid out on this policy, in US dollars"
+  totalPaidOut: Float!
+}
+
+"New in version 2: Billing adds each claim's payout to the Claims team's Claim type."
+type Claim @key(fields: "id") {
+  id: ID!
+  "The payout for this claim, or null if it hasn't been paid"
+  payout: Payout
+}
+
+type Query {
+  payouts: [Payout!]!
+}

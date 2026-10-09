@@ -1,0 +1,14 @@
+{
+  "name": "claims-desk",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The app team's Claims Desk. Reads everything through the gateway. Pre-built for the Federated GraphQL + Kafka course.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^4.2.0"
+  }
+}

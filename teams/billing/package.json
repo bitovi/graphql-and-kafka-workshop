@@ -1,0 +1,24 @@
+{
+  "name": "billing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "The Billing team's subgraph and Kafka consumer. Pre-built for the Federated GraphQL + Kafka course.",
+  "scripts": {
+    "dev": "tsx watch --include \"src/**/*.graphql\" src/index.ts",
+    "build": "tsc && cp src/*.graphql dist/",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@apollo/server": "^5.5.1",
+    "@apollo/subgraph": "^2.15.1",
+    "@confluentinc/kafka-javascript": "^1.11.0",
+    "graphql": "^16.14.2",
+    "graphql-scalars": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

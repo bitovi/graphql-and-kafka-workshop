@@ -1,0 +1,34 @@
+{
+  "name": "claims",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Your Claims API. You own this code.",
+  "scripts": {
+    "dev": "tsx watch --include \"src/**/*.graphql\" src/index.ts",
+    "reset-data": "rm -f claims.json"
+  },
+  "dependencies": {
+    "@apollo/server": "^5.5.1",
+    "@apollo/subgraph": "^2.15.1",
+    "@as-integrations/express5": "^1.1.2",
+    "@confluentinc/kafka-javascript": "^1.11.0",
+    "@graphql-tools/schema": "^10.1.3",
+    "cors": "^2.8.6",
+    "dataloader": "^2.2.3",
+    "express": "^5.2.1",
+    "graphql": "^16.14.2",
+    "graphql-scalars": "^2.0.0",
+    "graphql-subscriptions": "^3.0.0",
+    "graphql-ws": "^6.3.0",
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.20.4",
+    "@types/ws": "^8.18.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

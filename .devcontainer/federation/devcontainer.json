@@ -1,0 +1,29 @@
+{
+  "name": "Federated GraphQL + Kafka",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "hostRequirements": {
+    "cpus": 8
+  },
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/federation",
+  "postCreateCommand": "(cd claims && npm ci) && (cd gateway && npm ci) && docker compose build",
+  "forwardPorts": [3000, 4000, 4002],
+  "portsAttributes": {
+    "3000": { "label": "Claims Desk", "onAutoForward": "silent" },
+    "4000": { "label": "Gateway", "onAutoForward": "silent" },
+    "4002": { "label": "Your Claims API", "onAutoForward": "silent" },
+    "4001": { "label": "Policies subgraph", "onAutoForward": "ignore" },
+    "4003": { "label": "Billing subgraph", "onAutoForward": "ignore" },
+    "9094": { "label": "Kafka", "onAutoForward": "ignore" }
+  },
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["README.md"]
+    },
+    "vscode": {
+      "extensions": ["GraphQL.vscode-graphql-syntax"]
+    }
+  }
+}

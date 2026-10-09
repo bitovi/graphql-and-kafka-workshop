@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Claims Desk</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Claims Desk</h1>
+        <p class="tagline">Every policy, its claims, and its payouts, from one GraphQL endpoint.</p>
+      </div>
+      <p id="updated" class="updated"></p>
+    </header>
+
+    <section id="sources" class="sources" aria-label="What the gateway can answer"></section>
+
+    <main>
+      <p id="error" class="error" hidden></p>
+      <table id="policies" hidden>
+        <thead>
+          <tr>
+            <th>Policy</th>
+            <th>Policyholder</th>
+            <th class="num">Annual premium</th>
+            <th>Claims</th>
+            <th class="num">Paid out</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

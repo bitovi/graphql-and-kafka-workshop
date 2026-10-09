@@ -1,0 +1,70 @@
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.9", import: ["@key"])
+
+"A date without a time, like 2026-10-01 (RFC 3339 full-date)"
+scalar LocalDate
+
+"""
+An insurance policy issued to a policyholder. Owned by the Policies team.
+Other subgraphs can add fields to it by its id.
+"""
+type Policy @key(fields: "id") {
+  id: ID!
+  "Human-readable identifier, e.g. AUTO-100001"
+  policyNumber: String!
+  type: PolicyType!
+  "Monthly premium in US dollars"
+  monthlyPremium: Float!
+  "Yearly premium in US dollars, calculated from monthlyPremium"
+  annualPremium: Float!
+  "Date coverage starts"
+  effectiveDate: LocalDate!
+  riskTier: RiskTier!
+  policyholder: Policyholder!
+}
+
+type Policyholder @key(fields: "id") {
+  id: ID!
+  name: String!
+  email: String!
+  policies: [Policy!]!
+}
+
+enum PolicyType {
+  AUTO
+  HOME
+  LIFE
+  RENTERS
+}
+
+"How likely a policy is to lead to a claim, as rated by underwriting"
+enum RiskTier {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+input IssuePolicyInput {
+  type: PolicyType!
+  monthlyPremium: Float!
+  policyholderId: ID!
+  riskTier: RiskTier!
+  effectiveDate: LocalDate
+}
+
+"Look up a policy by exactly one of these fields"
+input PolicyLookupInput @oneOf {
+  id: ID
+  policyNumber: String
+}
+
+type Query {
+  policies(type: PolicyType, riskTier: RiskTier): [Policy!]!
+  findPolicy(by: PolicyLookupInput!): Policy
+  policyholders: [Policyholder!]!
+  policyholder(id: ID!): Policyholder
+}
+
+type Mutation {
+  "Only agents can issue policies."
+  issuePolicy(input: IssuePolicyInput!): Policy!
+}

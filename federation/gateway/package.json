@@ -1,0 +1,15 @@
+{
+  "name": "gateway",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Hive Gateway, plus the Hive CLI composing the supergraph from the subgraphs in subgraphs.json.",
+  "scripts": {
+    "start": "node start.mjs"
+  },
+  "dependencies": {
+    "@graphql-hive/cli": "^0.66.0",
+    "@graphql-hive/gateway": "^2.15.2",
+    "graphql": "^16.14.2"
+  }
+}
