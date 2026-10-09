@@ -44,6 +44,9 @@ const server = new ApolloServer<Context>({
 });
 await server.start();
 
+// The API lives at /graphql. Send anyone who opens the root there, to Apollo Sandbox.
+app.get("/", (_req, res) => res.redirect("/graphql"));
+
 // Queries and mutations: Apollo Server as Express middleware.
 app.use(
   "/graphql",
