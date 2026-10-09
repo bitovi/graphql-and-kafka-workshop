@@ -15,7 +15,7 @@ You own the Claims API. The other teams' APIs, Kafka, and the Claims Desk run in
 
 ## Start everything
 
-Use two terminals, both starting in this folder:
+Use three terminals, all starting in this folder. The first two run these, and the third is for other commands:
 
 ```sh
 npm start                     # Kafka, Policies, Billing, the Claims Desk, then the gateway
