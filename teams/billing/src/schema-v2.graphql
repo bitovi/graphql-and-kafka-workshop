@@ -11,6 +11,8 @@ type Payout @key(fields: "id") {
   "Amount paid in US dollars"
   amount: Float!
   paidOn: LocalDate!
+  "The policy this payout was made on. The Policies team owns policies."
+  policy: Policy!
 }
 
 "Billing adds payout fields to the Policies team's Policy type."

@@ -1,5 +1,5 @@
 import { LocalDateResolver } from "graphql-scalars";
-import { payouts } from "./data.js";
+import { payouts, type Payout } from "./data.js";
 
 export const resolvers = {
   LocalDate: LocalDateResolver,
@@ -10,6 +10,9 @@ export const resolvers = {
 
   Payout: {
     __resolveReference: (reference: { id: string }) => payouts.find((p) => p.id === reference.id),
+    // Billing only knows the policy's id. Returning { id } is enough: the gateway gets the
+    // policy's other fields from the Policies subgraph.
+    policy: (payout: Payout) => ({ id: payout.policyId }),
   },
 
   // Billing only knows a policy's id. The gateway asks the Policies subgraph for everything else.
