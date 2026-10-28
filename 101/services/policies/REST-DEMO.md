@@ -96,19 +96,19 @@ echo "REST: $R bytes / 4 calls — GraphQL: $G bytes / 1 call"
 
 *Response appears.*
 
-> That's it. One request. Exactly the two fields, already joined. The response has the same shape as the query — which is the thing to notice: I described the result I wanted, and that's what came back.
+> That's it. One request. Exactly the two fields, already joined. The response has the same shape as the query. I described the result I wanted, and that's what came back.
 
-### 1:50 – 2:25 — The numbers, honestly
+### 1:50 – 2:25 — The numbers
 
 *Show the comparison table.*
 
 > Four requests down to one. About twelve hundred bytes down to under four hundred.
 >
-> Now the honest part. A well-designed REST API can narrow this gap — specs like JSON:API let clients ask for sparse fields and include related resources. If that's all you need, you may not need GraphQL.
+> There's a fair counterpoint. A well-designed REST API can narrow this gap. Specs like JSON:API let clients ask for sparse fields and include related resources. If that's all you need, you may not need GraphQL.
 
 ### 2:25 – 2:45 — Where it actually wins
 
-> Where this becomes hard to argue with is when the data lives behind *many* services. One query, one graph, and the client never knows how many backends answered it. That's federation, and it's built on exactly the mechanics you just saw.
+> Where GraphQL earns its cost is when the data lives behind *many* services. One query, one graph, and the client never knows how many backends answered it. That's federation, and it's built on exactly the mechanics you just saw.
 >
 > That's what GraphQL 101 teaches — on one small service, so the ideas are clear before the architecture gets big.
 
